@@ -3,7 +3,7 @@ import React from "react"
 
 export function AuthLayout({children}: {children: React.ReactNode}) {
     return (
-    <div>
+    <div className="flex h-screen flex-col">
         <AppContent>
             {children}
         </AppContent>
