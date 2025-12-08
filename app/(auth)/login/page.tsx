@@ -11,7 +11,7 @@ export default function LogintPage() {
     return (
         <AuthLayout>
             <div className="min-w-full flex flex-col items-center justify-center h-full">
-                <Card className="p-2 max-w-[80vh] w-full max-h-[90vh]">
+                <Card className="p-2 max-w-[60vh] w-full max-h-[90vh]">
                     <div className="flex flex-row justify-center items-center relative">
                         <Link href="/" className="absolute left-0">
                             <Button variant="link" className="p-1">
