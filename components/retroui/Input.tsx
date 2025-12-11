@@ -10,6 +10,10 @@ export const Input: React.FC<InputProps> = ({
   className = "",
   ...props
 }) => {
+  const numberInputClass = type === "number" 
+    ? "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+    : "";
+  
   return (
     <input
       type={type}
@@ -18,7 +22,7 @@ export const Input: React.FC<InputProps> = ({
         props["aria-invalid"]
           ? "border-destructive text-destructive shadow-xs shadow-destructive"
           : ""
-      } ${className}`}
+      } ${numberInputClass} ${className}`}
       {...props}
     />
   );

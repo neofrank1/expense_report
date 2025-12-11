@@ -23,7 +23,7 @@ export function AppHeader() {
                 </SignedOut>
                 <SignedIn>
                     <div className="hidden md:flex items-center gap-1 py-2">
-                        <Text as="h6" className="dark:text-white">{user?.firstName} {user?.lastName}</Text>
+                        <Text as="h6" className="dark:text-white mr-1">{user?.firstName} {user?.lastName}</Text>
                         <UserButton />
                     </div>
                 </SignedIn>
