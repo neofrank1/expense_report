@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils"
 import React from "react"
 import {
   Cell,
+  Legend,
   Pie,
   PieChart as RechartsPieChart,
   ResponsiveContainer,
@@ -19,6 +20,7 @@ interface PieChartProps extends React.HTMLAttributes<HTMLDivElement> {
   tooltipBorderColor?: string
   valueFormatter?: (value: number) => string
   showTooltip?: boolean
+  showLegend?: boolean
   innerRadius?: number
   outerRadius?: number
   className?: string
@@ -35,6 +37,7 @@ const PieChart = React.forwardRef<HTMLDivElement, PieChartProps>(
       tooltipBorderColor = "var(--border)",
       valueFormatter = (value: number) => value.toString(),
       showTooltip = true,
+      showLegend = false,
       innerRadius = 0,
       outerRadius = 100,
       className,
@@ -51,7 +54,7 @@ const PieChart = React.forwardRef<HTMLDivElement, PieChartProps>(
               dataKey={dataKey}
               nameKey={nameKey}
               cx="50%"
-              cy="50%"
+              cy={showLegend ? "40%" : "50%"}
               innerRadius={innerRadius}
               outerRadius={outerRadius}
               isAnimationActive={false}
@@ -91,6 +94,21 @@ const PieChart = React.forwardRef<HTMLDivElement, PieChartProps>(
                     </div>
                   )
                 }}
+              />
+            )}
+            {showLegend && (
+              <Legend
+                iconType="circle"
+                align="center"
+                verticalAlign="bottom"
+                layout="horizontal"
+                wrapperStyle={{ 
+                  paddingTop: '10px',
+                  width: '100%',
+                  textAlign: 'center'
+                }}
+                iconSize={10}
+                formatter={(value) => <span style={{ color: 'var(--foreground)', fontSize: '0.875rem' }}>{value}</span>}
               />
             )}
           </RechartsPieChart>
