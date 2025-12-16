@@ -28,4 +28,4 @@ interface ExpenseByCategory {
     total_amount: number
 }
 
-export type { Expense, ExpenseCategoryData, TotalExpensesByMonth };
+export type { Expense, ExpenseCategoryData, TotalExpensesByMonth, ExpenseByCategory };
