@@ -14,7 +14,7 @@ import { PieChart } from "@/components/retroui/charts/PieChart";
 import { AreaChart } from "@/components/retroui/charts/AreaChart";
 import { insertExpense } from "@/actions/expense-actions";
 import { useUser } from "@clerk/nextjs";
-import { Expense } from "@/types/expense.types";
+import { Expense, ExpenseCategoryData, TotalExpensesByMonth } from "@/types/expense.types";
 import { useRouter } from "next/navigation";
 
 export function TotalSpendingsDashboard({
@@ -33,10 +33,15 @@ export function TotalSpendingsDashboard({
 
     const defaultRenderItem = (item: any, index: number) => (
         <Card className="w-full">
-            <Card.Content className="flex aspect-video items-center justify-center p-12">
-                <span className="text-6xl font-semibold">
-                    {typeof item === 'object' && item !== null ? index + 1 : item ?? index + 1}
-                </span>
+            <Card.Content className="flex aspect-video items-center justify-center p-10">
+                <div className="flex flex-col items-center justify-center">
+                    <span className="text-xl text-muted-foreground mb-2">
+                        {item.category_name}
+                    </span>
+                    <span className="text-3xl font-semibold">
+                        {item.total_amount.toLocaleString()}
+                    </span>
+                </div>
             </Card.Content>
         </Card>
     );
@@ -137,13 +142,6 @@ export function AddExpenseDashboardButton({ categories }: { categories: { id: nu
     );
 }
 
-type ExpenseCategoryData = {
-    category_id: number | null;
-    category_name: string;
-    total_amount: number | string;
-    count: number;
-};
-
 export function TotalSpendingsPieChart({className, data}: {className: string, data: ExpenseCategoryData[]}) {
     const [pieChartData, setPieChartData] = useState<{ name: string, value: number }[]>([]);
 
@@ -182,13 +180,44 @@ export function TotalSpendingsPieChart({className, data}: {className: string, da
         />
     );
 }
-
-const data = [{ name: 'Jan', orders: 12 }, { name: 'Feb', orders: 32 }, { name: 'Mar', orders: 19 }, { name: 'Apr', orders: 35 }, { name: 'May', orders: 40 }, { name: 'Jun', orders: 25 }];
  
-export function TotalSpendingsPerDayAreaChart({ className }: { className: string }) {
+export function TotalSpendingsPerDayAreaChart({ className, data }: { className: string, data: TotalExpensesByMonth[]}) {
+    const [chartData, setChartData] = useState<{ name: string; orders: number }[]>([]);
+
+    useEffect(() => {
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth() + 1; // 1-12
+
+        // Create a map of existing data by month
+        const dataMap = new Map<number, number>();
+
+        data.forEach((item) => {
+            const itemYear = Number(item.year);
+            const itemMonth = Number(item.month_number);
+            const itemAmount = Number(item.total_amount) || 0;
+            
+            if (itemYear === currentYear) {
+                dataMap.set(itemMonth, itemAmount);
+            }
+        });
+
+        // Generate array from January to current month
+        const processedData: { name: string; orders: number }[] = [];
+        for (let month = 1; month <= currentMonth; month++) {
+            const total = dataMap.get(month) || 0;
+            processedData.push({
+                name: monthNames[month - 1],
+                orders: total
+            });
+        }
+        setChartData(processedData);
+    }, [data]);
+
     return (
         <AreaChart
-            data={data}
+            data={chartData}
             index="name"
             categories={["orders"]}
             className={className || ""}

@@ -7,30 +7,28 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { TotalSpendingsPieChart } from "@/components/dashboard/dashboardComponents";
 import { TotalSpendingsPerDayAreaChart } from "@/components/dashboard/dashboardComponents";
-import { getExpenseCategories, getExpenses } from "@/actions/expense-actions";
+import { getExpenseCategories, getExpenses, getExpensesByMonth, getExpensesByCategory } from "@/actions/expense-actions";
+import { syncUser } from "@/actions/user-actions";
+import { SidebarDashboard } from "@/components/dashboard/sidebar-dashboard";
+import { ExpenseCategoryData, ExpenseByCategory } from "@/types/expense.types";
 
 export default async function DashboardPage() {    
     const user = await currentUser();
     if (!user) {
         redirect("/");
     }
+
+    await syncUser();
     const expenseCategories = await getExpenseCategories();
     const expenses = await getExpenses();
+    const TotalExpensesByMonth = await getExpensesByMonth();
+    const expensesByCategory = await getExpensesByCategory();
 
     return (
         <AppLayout>
             <div className="grid grid-cols-12 gap-4 h-full overflow-hidden">
                 <div className="col-span-2 p-4 overflow-hidden">
-                    <Card className="p-4 h-full max-w-full min-w-[14vw]">
-                        <Card.Title>
-                            Menu
-                        </Card.Title>
-                        <Card.Content>
-                            <p>
-                                This is a test card.
-                            </p>
-                        </Card.Content>
-                    </Card>
+                    <SidebarDashboard />
                 </div>
                 <div className="col-span-10 p-4 overflow-y-auto">
                     <div className="grid gap-4">
@@ -46,7 +44,7 @@ export default async function DashboardPage() {
                         <div className="mt-2">
                             <TotalSpendingsDashboard 
                                 className="basis-1/4 p-4"
-                                data={[1, 2, 3, 4, 5]}
+                                data={expensesByCategory as ExpenseByCategory[]}
                             />
                         </div>
                     </div>
@@ -55,7 +53,7 @@ export default async function DashboardPage() {
                             <Text as='h3'>Total Spendings</Text>
                             <Card className="mt-2 w-full h-[400px]">
                                 <Card.Content className="h-full">
-                                    <TotalSpendingsPieChart className="my-5" data={expenses as { category_id: number, category_name: string, total_amount: number, count: number }[]}/>
+                                    <TotalSpendingsPieChart className="my-5" data={expenses as ExpenseCategoryData[]}/>
                                 </Card.Content>
                             </Card>
                         </div>
@@ -63,7 +61,7 @@ export default async function DashboardPage() {
                             <Text as='h3'>Total Spendings this Month</Text>
                             <Card className="mt-2 w-full h-[400px] max-w-full">
                                 <Card.Content>
-                                    <TotalSpendingsPerDayAreaChart className="my-4" />
+                                    <TotalSpendingsPerDayAreaChart className="my-4" data={TotalExpensesByMonth}/>
                                 </Card.Content>
                             </Card>
                         </div>
