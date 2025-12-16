@@ -3,7 +3,8 @@ import { Archivo_Black, Space_Grotesk } from "next/font/google";
 import "./(root)/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ClerkProvider } from "@clerk/nextjs";
- 
+import { neobrutalism } from '@clerk/themes';
+
 const archivoBlack = Archivo_Black({
   subsets: ["latin"],
   weight: "400",
@@ -29,7 +30,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        layout: {
+          socialButtonsPlacement: 'bottom',
+          termsPageUrl: 'https://clerk.com/terms',
+        },
+        signIn: { theme: neobrutalism },
+        signUp: { theme: neobrutalism },
+      }}
+    >
       <html lang="en">
         <body
           className={`${archivoBlack.variable} ${space.variable}`}
