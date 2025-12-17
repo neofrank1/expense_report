@@ -182,7 +182,7 @@ export function TotalSpendingsPieChart({className, data}: {className: string, da
 }
  
 export function TotalSpendingsPerDayAreaChart({ className, data }: { className: string, data: TotalExpensesByMonth[]}) {
-    const [chartData, setChartData] = useState<{ name: string; orders: number }[]>([]);
+    const [chartData, setChartData] = useState<{ month: string; total_amount: number }[]>([]);
 
     useEffect(() => {
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -208,8 +208,8 @@ export function TotalSpendingsPerDayAreaChart({ className, data }: { className: 
         for (let month = 1; month <= currentMonth; month++) {
             const total = dataMap.get(month) || 0;
             processedData.push({
-                name: monthNames[month - 1],
-                orders: total
+                month: monthNames[month - 1],
+                total_amount: total
             });
         }
         setChartData(processedData);
@@ -218,8 +218,8 @@ export function TotalSpendingsPerDayAreaChart({ className, data }: { className: 
     return (
         <AreaChart
             data={chartData}
-            index="name"
-            categories={["orders"]}
+            index="month"
+            categories={["total_amount"]}
             className={className || ""}
         />
     )

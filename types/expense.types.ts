@@ -28,4 +28,12 @@ interface ExpenseByCategory {
     total_amount: number
 }
 
-export type { Expense, ExpenseCategoryData, TotalExpensesByMonth, ExpenseByCategory };
+interface DashboardLayoutProps {
+    userName: string;
+    expenseCategories: any[];
+    expenses: ExpenseCategoryData[];
+    TotalExpensesByMonth: any[];
+    expensesByCategory: ExpenseByCategory[];
+}
+
+export type { Expense, ExpenseCategoryData, TotalExpensesByMonth, ExpenseByCategory, DashboardLayoutProps };
