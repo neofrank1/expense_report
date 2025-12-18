@@ -2,7 +2,6 @@
 
 import { Card } from "../retroui/Card";
 import Link from "next/link";
-import { Button } from "../retroui/Button";
 import { DashboardMenu } from "@/types/dashboard.types";
 import { Euro, Home, DollarSign, PhilippinePeso } from "lucide-react";
 import { Text } from "../retroui/Text";
@@ -15,8 +14,8 @@ const dashboardMenus: DashboardMenu[] = [
         icon: <Home />
     },
     {
-        name: "Settings",
-        href: "/settings",
+        name: "Expense History",
+        href: "/history",
         icon: <Home />
     }
 ]
@@ -31,12 +30,9 @@ export function SidebarDashboard() {
             <div className="grid grid-rows gap-4 justify-center items-center">
                 {dashboardMenus.map((menu, index) => (
                     <Link href={menu.href} key={index}>
-                        <Button variant="link" className="text-center justify-start w-full">
-                            <span className="flex flex-row items-center justify-start gap-2">
-                                {menu.icon}
-                                <Text as="h4" >{menu.name}</Text>
-                            </span>
-                        </Button>
+                        <span className="flex flex-col items-center justify-start gap-2">
+                            <Text as="h6" className="text-center" >{menu.name}</Text>
+                        </span>
                     </Link>
                 ))}
             </div>

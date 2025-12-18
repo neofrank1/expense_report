@@ -2,8 +2,8 @@
 
 import { db } from "@/db/drizzle";
 import { expense_categories, users, user_expenses } from "@/db/schema";
-import { and, eq, sql } from "drizzle-orm";
-import { Expense } from "@/types/expense.types";
+import { and, eq, gte, lte, sql, ilike, desc } from "drizzle-orm";
+import { Expense, ExpenseSearchParams } from "@/types/expense.types";
 import { currentUser } from "@clerk/nextjs/server";
 
 export async function getExpenseCategories() {
@@ -120,5 +120,59 @@ export async function getExpensesByCategory() {
     .where(eq(user_expenses.user_id, user.id))
     .groupBy(user_expenses.category_id, expense_categories.name);
 
+    return expenses;
+}
+
+export async function getExpensesBySearchParams(searchParams?: Partial<ExpenseSearchParams>) {
+    const user = await currentUser();
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    // Build where conditions array
+    const conditions = [eq(user_expenses.user_id, user.id)];
+
+    if (searchParams?.expense_name && searchParams.expense_name.trim() !== '') {
+        conditions.push(ilike(user_expenses.name, `%${searchParams.expense_name}%`));
+    }
+
+    if (searchParams?.expense_amount) {
+        const amount = typeof searchParams.expense_amount === 'string' ? parseFloat(searchParams.expense_amount) : searchParams.expense_amount;
+        if (!isNaN(amount) && amount > 0) {
+            conditions.push(gte(user_expenses.amount, amount));
+        }
+    }
+
+    if (searchParams?.expense_date) {
+        const date = typeof searchParams.expense_date === 'string' ? new Date(searchParams.expense_date) : searchParams.expense_date;
+        if (!isNaN(date.getTime())) {
+            conditions.push(eq(user_expenses.date, date));
+        }
+    }
+
+    if (searchParams?.expense_category && searchParams.expense_category !== 0 && searchParams.expense_category !== 'all') {
+        const categoryId = typeof searchParams.expense_category === 'string' ? parseInt(searchParams.expense_category) : searchParams.expense_category;
+        if (!isNaN(categoryId)) {
+            conditions.push(eq(user_expenses.category_id, categoryId));
+        }
+    }
+
+    // Get individual expenses with category information
+    const expenses = await db
+        .select({
+            id: user_expenses.id,
+            name: user_expenses.name,
+            amount: user_expenses.amount,
+            date: user_expenses.date,
+            description: sql<string>`COALESCE(${user_expenses.description}, '')`.as('description'),
+            category_id: sql<number>`COALESCE(${user_expenses.category_id}, 0)`.as('category_id'),
+            category_name: sql<string>`COALESCE(${expense_categories.name}, 'Uncategorized')`.as('category_name'),
+            total_amount: user_expenses.amount
+        })
+        .from(user_expenses)
+        .leftJoin(expense_categories, eq(user_expenses.category_id, expense_categories.id))
+        .where(and(...conditions))
+        .orderBy(desc(user_expenses.date));
+    
     return expenses;
 }

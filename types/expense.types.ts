@@ -36,4 +36,19 @@ interface DashboardLayoutProps {
     expensesByCategory: ExpenseByCategory[];
 }
 
-export type { Expense, ExpenseCategoryData, TotalExpensesByMonth, ExpenseByCategory, DashboardLayoutProps };
+interface ExpenseBySearchParams extends ExpenseByCategory{
+    id: number;
+    name: string;
+    amount: number;
+    date: Date;
+    description: string;
+}
+
+type ExpenseSearchParams = {
+    expense_name?: string;
+    expense_amount?: number | string;
+    expense_date?: Date | string;
+    expense_category?: number | string;
+}
+
+export type { Expense, ExpenseCategoryData, TotalExpensesByMonth, ExpenseByCategory, DashboardLayoutProps, ExpenseBySearchParams, ExpenseSearchParams };
