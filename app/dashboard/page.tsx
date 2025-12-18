@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getExpenseCategories, getExpenses, getExpensesByMonth, getExpensesByCategory } from "@/actions/expense-actions";
 import { syncUser } from "@/actions/user-actions";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
+import { DashboardContent } from "@/components/dashboard/dashboard-content";
 import { ExpenseCategoryData, ExpenseByCategory } from "@/types/expense.types";
 
 export default async function DashboardPage() {    
@@ -20,13 +21,15 @@ export default async function DashboardPage() {
 
     return (
         <AppLayout>
-            <DashboardLayout
-                userName={user?.fullName || ''}
-                expenseCategories={expenseCategories}
-                expenses={expenses as ExpenseCategoryData[]}
-                TotalExpensesByMonth={TotalExpensesByMonth}
-                expensesByCategory={expensesByCategory as ExpenseByCategory[]}
-            />
+            <DashboardLayout>
+                <DashboardContent
+                    userName={user?.fullName || ''}
+                    expenseCategories={expenseCategories}
+                    expenses={expenses as ExpenseCategoryData[]}
+                    TotalExpensesByMonth={TotalExpensesByMonth}
+                    expensesByCategory={expensesByCategory as ExpenseByCategory[]}
+                />
+            </DashboardLayout>
         </AppLayout>
     );
 }
