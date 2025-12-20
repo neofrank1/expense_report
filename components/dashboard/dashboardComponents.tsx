@@ -204,7 +204,7 @@ export function TotalSpendingsPerDayAreaChart({ className, data }: { className: 
         });
 
         // Generate array from January to current month
-        const processedData: { name: string; orders: number }[] = [];
+        const processedData: { month: string; total_amount: number }[] = [];
         for (let month = 1; month <= currentMonth; month++) {
             const total = dataMap.get(month) || 0;
             processedData.push({
