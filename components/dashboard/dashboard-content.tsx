@@ -50,7 +50,7 @@ export function DashboardContent({
                 <div>
                     <Text as="h3" className="mt-4">Total Spendings by Category</Text>
                 </div>
-                <div className="mt-2">
+                <div className="mt-2 overflow-hidden">
                     <TotalSpendingsDashboard 
                         className="basis-1/4 p-4"
                         data={expensesByCategory as ExpenseByCategory[]}
