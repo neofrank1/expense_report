@@ -71,7 +71,7 @@ const AreaChart = React.forwardRef<HTMLDivElement, AreaChartProps>(
     return (
       <div ref={ref} className={cn("h-80 w-full", className)} {...props}>
         <ResponsiveContainer width="100%" height="100%">
-          <RechartsAreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+          <RechartsAreaChart data={data} margin={{ top: 10, right: 30, left: 20, bottom: 0 }}>
             <defs>
               {categories.map((category, index) => {
                 const fillColor = fillColors[index] || fillColors[0]
