@@ -4,7 +4,7 @@ import { expense_categories } from './schema';
 
 config({ path: '.env' });
 
-const db = drizzle(process.env.DATABASE_URL!);
+const db = process.env.APP_ENV === 'production' ? drizzle(process.env.DATABASE_URL_PRODUCTION!) : drizzle(process.env.DATABASE_URL_DEVELOPMENT!);
 
 async function seed() {
     try {
