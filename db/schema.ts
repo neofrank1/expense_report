@@ -5,11 +5,14 @@ import {
     pgTable,
     timestamp,
     varchar,
-    boolean
+    boolean,
+    numeric
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
     id: serial("id").primaryKey(),
+    first_name: varchar("first_name", { length: 255 }).notNull(),
+    last_name: varchar("last_name", { length: 255 }).notNull(),
     full_name: varchar("full_name", { length: 255 }).notNull(),
     email: varchar("email", { length: 255 }).notNull().unique(),
     clerk_id: varchar("clerk_id", { length: 255 }).notNull().unique(),
@@ -27,7 +30,7 @@ export const expense_categories = pgTable("expense_categories", {
 export const user_expenses = pgTable("user_expenses", {
     id: serial("id").primaryKey(),
     name: varchar("name", { length: 255 }).notNull(),
-    amount: integer("amount").notNull(),
+    amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
     date: timestamp("date").notNull(),
     category_id: integer("category_id").references(() => expense_categories.id),
     description: text("description"),

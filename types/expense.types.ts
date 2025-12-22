@@ -1,6 +1,6 @@
 interface Expense {
     name: string;
-    amount: number;
+    amount: number | string;
     date: Date;
     category_id: number;
     description: string;
@@ -18,14 +18,14 @@ interface TotalExpensesByMonth {
     month: string;
     year: number;
     month_number: number;
-    total_amount: number;
+    total_amount: number | string;
     count: number;
 }
 
 interface ExpenseByCategory {
     category_id: number,
     category_name: string,
-    total_amount: number
+    total_amount: number | string;
 }
 
 interface DashboardLayoutProps {
@@ -39,7 +39,7 @@ interface DashboardLayoutProps {
 interface ExpenseBySearchParams extends ExpenseByCategory{
     id: number;
     name: string;
-    amount: number;
+    amount: number | string;
     date: Date;
     description: string;
 }
@@ -51,4 +51,8 @@ type ExpenseSearchParams = {
     expense_category?: number | string;
 }
 
-export type { Expense, ExpenseCategoryData, TotalExpensesByMonth, ExpenseByCategory, DashboardLayoutProps, ExpenseBySearchParams, ExpenseSearchParams };
+interface ExpenseEditParams extends Expense {
+    id: number;
+}
+
+export type { Expense, ExpenseCategoryData, TotalExpensesByMonth, ExpenseByCategory, DashboardLayoutProps, ExpenseBySearchParams, ExpenseSearchParams, ExpenseEditParams };

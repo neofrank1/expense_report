@@ -6,7 +6,7 @@ import { Loader } from "../retroui/Loader";
 import { Menu, X } from "lucide-react";
 import { useDashboardLayout } from "../dashboard/dashboard-layout";
 import { HistoryTableComponent, SearchFiltersComponent } from "./history-component";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ExpenseBySearchParams } from "@/types/expense.types";
 import { getExpensesBySearchParams } from "@/actions/expense-actions";
 
@@ -37,6 +37,14 @@ export function HistoryContent({ expenseCategories, expensesTable }: { expenseCa
             setIsLoading(false);
         }
     }
+
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            const results = await getExpensesBySearchParams();
+            setExpenses(results);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [expenses]);
 
     return (
         <>
@@ -76,7 +84,7 @@ export function HistoryContent({ expenseCategories, expensesTable }: { expenseCa
                         <Text as="h2" className="dark:text-foreground">No expenses found</Text>
                     </div>
                 ) : (
-                    <HistoryTableComponent expenses={expenses}/>
+                    <HistoryTableComponent expenses={expenses} expenseCategories={expenseCategories}/>
                 )}
             </div>
         </>

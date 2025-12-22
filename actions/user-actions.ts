@@ -24,6 +24,8 @@ export async function syncUser() {
             await db.insert(users).values({
                 clerk_id: user.id,
                 email: user.emailAddresses[0]?.emailAddress || '',
+                first_name: user.firstName || '',
+                last_name: user.lastName || '',
                 full_name: user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Unknown',
             });
         }

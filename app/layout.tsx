@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Archivo_Black, Space_Grotesk } from "next/font/google";
 import "./(root)/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { CurrencyProvider } from "@/contexts/currency-context";
 import { ClerkProvider } from "@clerk/nextjs";
 import { neobrutalism } from '@clerk/themes';
 
@@ -45,7 +46,9 @@ export default function RootLayout({
           className={`${archivoBlack.variable} ${space.variable}`}
         >
           <ThemeProvider>
-            {children}
+            <CurrencyProvider>
+              {children}
+            </CurrencyProvider>
           </ThemeProvider>
         </body>
       </html>

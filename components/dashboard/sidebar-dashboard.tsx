@@ -6,6 +6,7 @@ import { DashboardMenu } from "@/types/dashboard.types";
 import { Euro, Home, DollarSign, PhilippinePeso } from "lucide-react";
 import { Text } from "../retroui/Text";
 import { Select } from "@/components/retroui/Select";
+import { useCurrency } from "@/contexts/currency-context";
 
 const dashboardMenus: DashboardMenu[] = [
     {
@@ -21,6 +22,8 @@ const dashboardMenus: DashboardMenu[] = [
 ]
 
 export function SidebarDashboard() {
+    const { currency, setCurrency } = useCurrency();
+
     return (
         <Card className="p-4 h-full max-w-full min-w-[14vw]">
             <Card.Title className="text-center">
@@ -37,7 +40,7 @@ export function SidebarDashboard() {
                 ))}
             </div>
             <div className="mt-auto mb-1">
-                <Select name="category">
+                <Select name="currency" value={currency} onValueChange={(value) => setCurrency(value as 'USD' | 'EUR' | 'PHP')}>
                     <Select.Trigger className="dark:text-slate-900 dark:bg-white dark:border-slate-900 w-full h-full">
                         <Select.Value placeholder="Pick Currency" />
                     </Select.Trigger>

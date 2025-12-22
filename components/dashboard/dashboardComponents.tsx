@@ -16,6 +16,7 @@ import { insertExpense } from "@/actions/expense-actions";
 import { useUser } from "@clerk/nextjs";
 import { Expense, ExpenseCategoryData, TotalExpensesByMonth } from "@/types/expense.types";
 import { useRouter } from "next/navigation";
+import { useCurrency } from "@/contexts/currency-context";
 
 export function TotalSpendingsDashboard({
     className, 
@@ -26,6 +27,8 @@ export function TotalSpendingsDashboard({
     data: any[] | number;
     renderItem?: (item: any, index: number) => React.ReactNode;
 }) {
+    const { formatCurrency } = useCurrency();
+    
     // Convert data to array: if number, create array of that length, if array use it directly
     const itemsArray = Array.isArray(data) 
         ? data 
@@ -39,7 +42,7 @@ export function TotalSpendingsDashboard({
                         {item.category_name}
                     </span>
                     <span className="text-3xl font-semibold">
-                        {item.total_amount.toLocaleString()}
+                        {formatCurrency(item.total_amount)}
                     </span>
                 </div>
             </Card.Content>
@@ -73,7 +76,7 @@ export function AddExpenseDashboardButton({ categories }: { categories: { id: nu
             const expense = Object.fromEntries(formData);
             const expenseData: Expense = {
                 name: expense.name as string,
-                amount: Math.round(parseFloat(expense.amount as string)), // Ensure integer for database
+                amount: parseFloat(expense.amount as string), // Ensure integer for database
                 date: new Date(expense.date as string),
                 category_id: parseInt(expense.category as string),
                 description: expense.description as string,
@@ -107,7 +110,7 @@ export function AddExpenseDashboardButton({ categories }: { categories: { id: nu
                             </div>
                             <div className="gap-2 flex flex-col">
                                 <Label htmlFor="expense_ammount" className="dark:text-foreground">Expense Amount</Label>
-                                <Input type="number" name="amount" placeholder="Expense Amount" className="dark:text-slate-900 dark:bg-white"/>
+                                <Input type="number" name="amount" placeholder="Expense Amount" step="0.01" className="dark:text-slate-900 dark:bg-white"/>
                             </div>
                             <div className="gap-2 flex flex-col">
                                 <Label htmlFor="expense_ammount" className="dark:text-foreground">Expense Date</Label>
@@ -143,6 +146,7 @@ export function AddExpenseDashboardButton({ categories }: { categories: { id: nu
 }
 
 export function TotalSpendingsPieChart({className, data}: {className: string, data: ExpenseCategoryData[]}) {
+    const { formatCurrency } = useCurrency();
     const [pieChartData, setPieChartData] = useState<{ name: string, value: number }[]>([]);
 
     useEffect(() => {
@@ -177,11 +181,13 @@ export function TotalSpendingsPieChart({className, data}: {className: string, da
             colors={['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF6384', '#FF6342', '#FF3424']}
             className={className}
             showLegend={true}
+            valueFormatter={(value: number) => formatCurrency(value)}
         />
     );
 }
  
 export function TotalSpendingsPerDayAreaChart({ className, data }: { className: string, data: TotalExpensesByMonth[]}) {
+    const { formatCurrency } = useCurrency();
     const [chartData, setChartData] = useState<{ month: string; total_amount: number }[]>([]);
 
     useEffect(() => {
@@ -221,6 +227,7 @@ export function TotalSpendingsPerDayAreaChart({ className, data }: { className: 
             index="month"
             categories={["total_amount"]}
             className={className || ""}
+            valueFormatter={(value: number) => formatCurrency(value)}
         />
     )
 }

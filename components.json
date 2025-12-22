@@ -18,7 +18,8 @@
     "ui": "@/components/ui",
     "retroui": "@/components/retroui",
     "lib": "@/lib",
-    "hooks": "@/hooks"
+    "hooks": "@/hooks",
+    "contexts": "@/contexts"
   },
   "registries": {
     "@retroui": "https://retroui.dev/r/{name}.json"
