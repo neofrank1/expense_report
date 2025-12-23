@@ -57,7 +57,7 @@ export function SearchFiltersComponent({ expenseCategories }: { expenseCategorie
     )
 }
 
-export function HistoryTableComponent({ expenses, expenseCategories }: { expenses: ExpenseBySearchParams[], expenseCategories: { categories: any[] } }) {
+export function HistoryTableComponent({ expenses, expenseCategories, onRefresh }: { expenses: ExpenseBySearchParams[], expenseCategories: { categories: any[] }, onRefresh?: () => void }) {
     const { formatCurrency } = useCurrency();
     
     return (
@@ -101,8 +101,8 @@ export function HistoryTableComponent({ expenses, expenseCategories }: { expense
                                 </Table.Cell>
                                 <Table.Cell>{formatCurrency(expense.amount)}</Table.Cell>
                                 <Table.Cell className="flex items-center gap-2 justify-center">
-                                    <EditExpenseDialog expense={expense} expenseCategories={expenseCategories} />
-                                    <DeleteExpenseDialog expenseId={expense.id} />
+                                    <EditExpenseDialog expense={expense} expenseCategories={expenseCategories} onRefresh={onRefresh} />
+                                    <DeleteExpenseDialog expenseId={expense.id} onRefresh={onRefresh} />
                                 </Table.Cell>
                             </Table.Row>
                         ))}
@@ -113,7 +113,7 @@ export function HistoryTableComponent({ expenses, expenseCategories }: { expense
     )
 }
 
-export function EditExpenseDialog({ expense, expenseCategories }: { expense: ExpenseBySearchParams, expenseCategories: { categories: any[] } }) {
+export function EditExpenseDialog({ expense, expenseCategories, onRefresh }: { expense: ExpenseBySearchParams, expenseCategories: { categories: any[] }, onRefresh?: () => void }) {
     const [formData, setFormData] = useState({
         name: expense.name,
         amount: String(expense.amount),
@@ -121,6 +121,7 @@ export function EditExpenseDialog({ expense, expenseCategories }: { expense: Exp
         category: String(expense.category_id),
         description: expense.description || ''
     });
+    const [isOpen, setIsOpen] = useState(false);
     
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -136,7 +137,11 @@ export function EditExpenseDialog({ expense, expenseCategories }: { expense: Exp
                 category_id: parseInt(formDataObject.category),
                 description: formDataObject.description
             } as ExpenseEditParams);
-
+            
+            setIsOpen(false);
+            if (onRefresh) {
+                onRefresh();
+            }
         } catch (error) {
             console.error("Error updating expense:", error);
             alert(`Failed to update expense: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -145,7 +150,7 @@ export function EditExpenseDialog({ expense, expenseCategories }: { expense: Exp
     
     return (
        <>
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <Dialog.Trigger asChild>
                 <Button className="dark:bg-foreground dark:text-background dark:shadow-md dark:shadow-primary dark:hover:shadow-sm" size="icon">
                     <Pencil className="w-4 h-4" />
@@ -192,11 +197,9 @@ export function EditExpenseDialog({ expense, expenseCategories }: { expense: Exp
                             </div>
                             <Dialog.Footer>
                                 <Dialog.Trigger asChild>
-                                    <Button className="dark:bg-foreground dark:text-background dark:shadow-md dark:shadow-primary dark:hover:shadow-sm bg-white text-black">Cancel</Button>
+                                    <Button className="dark:bg-foreground dark:text-background dark:shadow-md dark:shadow-primary dark:hover:shadow-sm bg-white text-black" type="button">Cancel</Button>
                                 </Dialog.Trigger>
-                                <Dialog.Trigger asChild>
-                                    <Button className="dark:bg-foreground dark:text-background dark:shadow-md dark:shadow-primary dark:hover:shadow-sm" type="submit">Save</Button>
-                                </Dialog.Trigger>
+                                <Button className="dark:bg-foreground dark:text-background dark:shadow-md dark:shadow-primary dark:hover:shadow-sm" type="submit">Save</Button>
                             </Dialog.Footer>
                     </form>
                 </Dialog.Content>
@@ -205,11 +208,17 @@ export function EditExpenseDialog({ expense, expenseCategories }: { expense: Exp
     )
 }
 
-export function DeleteExpenseDialog({ expenseId }: { expenseId: number }) {
+export function DeleteExpenseDialog({ expenseId, onRefresh }: { expenseId: number, onRefresh?: () => void }) {
+    const [isOpen, setIsOpen] = useState(false);
+    
     const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         try {
             await deleteExpense(expenseId);
+            setIsOpen(false);
+            if (onRefresh) {
+                onRefresh();
+            }
         } catch (error) {
             console.error("Error deleting expense:", error);
             alert(`Failed to delete expense: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -218,7 +227,7 @@ export function DeleteExpenseDialog({ expenseId }: { expenseId: number }) {
     
     return (
         <>
-            <Dialog>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <Dialog.Trigger asChild>
                     <Button className="dark:bg-foreground dark:text-background dark:shadow-md dark:shadow-primary dark:hover:shadow-sm" size="icon">
                         <Trash className="w-4 h-4" />
@@ -234,13 +243,11 @@ export function DeleteExpenseDialog({ expenseId }: { expenseId: number }) {
                         </div>
                         <Dialog.Footer>
                             <Dialog.Trigger asChild>
-                                <Button className="dark:bg-foreground dark:text-background dark:shadow-md dark:shadow-primary dark:hover:shadow-sm bg-white text-black">Cancel</Button>
+                                <Button className="dark:bg-foreground dark:text-background dark:shadow-md dark:shadow-primary dark:hover:shadow-sm bg-white text-black" type="button">Cancel</Button>
                             </Dialog.Trigger>
-                            <Dialog.Trigger asChild>
-                                <Button className="dark:bg-red-500 dark:text-white dark:shadow-md dark:shadow-dark dark:hover:shadow-sm bg-red-500" size="icon" onClick={handleDelete}>
-                                    Delete
-                                </Button>
-                        </Dialog.Trigger>
+                            <Button className="dark:bg-red-500 dark:text-white dark:shadow-md dark:shadow-dark dark:hover:shadow-sm bg-red-500" size="icon" onClick={handleDelete} type="button">
+                                Delete
+                            </Button>
                     </Dialog.Footer>
                 </Dialog.Content>
             </Dialog>

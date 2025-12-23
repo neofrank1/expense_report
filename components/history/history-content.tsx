@@ -6,7 +6,7 @@ import { Loader } from "../retroui/Loader";
 import { Menu, X } from "lucide-react";
 import { useDashboardLayout } from "../dashboard/dashboard-layout";
 import { HistoryTableComponent, SearchFiltersComponent } from "./history-component";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ExpenseBySearchParams } from "@/types/expense.types";
 import { getExpensesBySearchParams } from "@/actions/expense-actions";
 
@@ -14,6 +14,21 @@ export function HistoryContent({ expenseCategories, expensesTable }: { expenseCa
     const { isSidebarOpen, toggleSidebar } = useDashboardLayout();
     const [expenses, setExpenses] = useState<ExpenseBySearchParams[]>(expensesTable.expenses);
     const [isLoading, setIsLoading] = useState(false);
+    const [currentSearchParams, setCurrentSearchParams] = useState<{
+        expense_name?: string;
+        expense_amount?: string;
+        expense_date?: string;
+        expense_category?: string;
+    }>({});
+    
+    const refreshExpenses = async () => {
+        try {
+            const results = await getExpensesBySearchParams(currentSearchParams);
+            setExpenses(results);
+        } catch (error) {
+            console.error("Error fetching expenses:", error);
+        }
+    };
     
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -29,6 +44,7 @@ export function HistoryContent({ expenseCategories, expensesTable }: { expenseCa
                 expense_category: formDataObject.category || undefined,
             };
             
+            setCurrentSearchParams(searchParams);
             const results = await getExpensesBySearchParams(searchParams);
             setExpenses(results);
         } catch (error) {
@@ -37,14 +53,6 @@ export function HistoryContent({ expenseCategories, expensesTable }: { expenseCa
             setIsLoading(false);
         }
     }
-
-    useEffect(() => {
-        const interval = setInterval(async () => {
-            const results = await getExpensesBySearchParams();
-            setExpenses(results);
-        }, 1000);
-        return () => clearInterval(interval);
-    }, [expenses]);
 
     return (
         <>
@@ -84,7 +92,7 @@ export function HistoryContent({ expenseCategories, expensesTable }: { expenseCa
                         <Text as="h2" className="dark:text-foreground">No expenses found</Text>
                     </div>
                 ) : (
-                    <HistoryTableComponent expenses={expenses} expenseCategories={expenseCategories}/>
+                    <HistoryTableComponent expenses={expenses} expenseCategories={expenseCategories} onRefresh={refreshExpenses}/>
                 )}
             </div>
         </>
