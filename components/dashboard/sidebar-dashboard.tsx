@@ -18,6 +18,11 @@ const dashboardMenus: DashboardMenu[] = [
         name: "Expense History",
         href: "/history",
         icon: <Home />
+    }, 
+    {
+        name: "Yearly Expense Report",
+        href: "/yearly-report",
+        icon: <Home />
     }
 ]
 
