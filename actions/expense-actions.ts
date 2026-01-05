@@ -3,7 +3,7 @@
 import { db } from "@/db/drizzle";
 import { expense_categories, users, user_expenses } from "@/db/schema";
 import { and, eq, gte, lte, sql, ilike, desc } from "drizzle-orm";
-import { Expense, ExpenseSearchParams, ExpenseEditParams } from "@/types/expense.types";
+import { Expense, ExpenseSearchParams, ExpenseEditParams, UserYearData, UserYearDataResponse } from "@/types/expense.types";
 import { currentUser } from "@clerk/nextjs/server";
 
 export async function getExpenseCategories() {
@@ -196,4 +196,74 @@ export async function deleteExpense(expenseId: number) {
         console.error("Database error:", error);
         throw new Error(`Failed to delete expense: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+}
+
+// Get the Users Data in years
+export async function getUserYearData(): Promise<UserYearDataResponse> {
+    const user = await currentUser();
+    
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    const yearData = await db
+        .select({
+            year: sql<number>`EXTRACT(YEAR FROM ${user_expenses.date})`.as('year'),
+            total_amount: sql<number>`COALESCE(SUM(${user_expenses.amount}), 0)`.as('total_amount'),
+            count: sql<number>`COUNT(${user_expenses.id})`.as('count')
+        })
+        .from(user_expenses)
+        .where(eq(user_expenses.user_id, user.id))
+        .groupBy(sql`EXTRACT(YEAR FROM ${user_expenses.date})`)
+        .orderBy(sql`EXTRACT(YEAR FROM ${user_expenses.date}) DESC`);
+    
+    // Get the start year (earliest year)
+    const startYearResult = await db
+        .select({
+            startYear: sql<number>`MIN(EXTRACT(YEAR FROM ${user_expenses.date}))`.as('startYear')
+        })
+        .from(user_expenses)
+        .where(eq(user_expenses.user_id, user.id));
+    
+    const startYear = startYearResult[0]?.startYear || null;
+    
+    return {
+        years: yearData,
+        startYear: startYear
+    };
+}
+
+// Get expenses for a specific year
+export async function getExpensesByYear(year: number) {
+    const user = await currentUser();
+    
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    if (!year || isNaN(year)) {
+        throw new Error("Valid year is required");
+    }
+
+    const expenses = await db
+        .select({
+            id: user_expenses.id,
+            name: user_expenses.name,
+            amount: sql<string>`${user_expenses.amount}`.as('amount'),
+            date: user_expenses.date,
+            description: sql<string>`COALESCE(${user_expenses.description}, '')`.as('description'),
+            category_id: sql<number>`COALESCE(${user_expenses.category_id}, 0)`.as('category_id'),
+            category_name: sql<string>`COALESCE(${expense_categories.name}, 'Uncategorized')`.as('category_name'),
+        })
+        .from(user_expenses)
+        .leftJoin(expense_categories, eq(user_expenses.category_id, expense_categories.id))
+        .where(
+            and(
+                eq(user_expenses.user_id, user.id),
+                sql`EXTRACT(YEAR FROM ${user_expenses.date}) = ${year}`
+            )
+        )
+        .orderBy(desc(user_expenses.date));
+    
+    return expenses;
 }
