@@ -55,4 +55,15 @@ interface ExpenseEditParams extends Expense {
     id: number;
 }
 
-export type { Expense, ExpenseCategoryData, TotalExpensesByMonth, ExpenseByCategory, DashboardLayoutProps, ExpenseBySearchParams, ExpenseSearchParams, ExpenseEditParams };
+interface UserYearData {
+    year: number;
+    total_amount: number | string;
+    count: number;
+}
+
+interface UserYearDataResponse {
+    years: UserYearData[];
+    startYear: number | null;
+}
+
+export type { Expense, ExpenseCategoryData, TotalExpensesByMonth, ExpenseByCategory, DashboardLayoutProps, ExpenseBySearchParams, ExpenseSearchParams, ExpenseEditParams, UserYearData, UserYearDataResponse };

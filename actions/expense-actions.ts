@@ -199,7 +199,7 @@ export async function deleteExpense(expenseId: number) {
 }
 
 // Get the Users Data in years
-export async function getUserYearData(): Promise<UserYearDataResponse> {
+export async function getUserYearData(year: number): Promise<UserYearDataResponse> {
     const user = await currentUser();
     
     if (!user) {
