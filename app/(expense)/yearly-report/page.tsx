@@ -18,9 +18,14 @@ export default async function ExpenseYearlyPage({
     if (!user) {
         redirect("/");
     }
-    
-    const userYearData = await getUserYearData();
-    const data = await getExpensesByYear(yearNumber);
+
+    const currentYear = new Date().getFullYear();
+
+
+    const userYearData = await getUserYearData(currentYear);
+    const data = await getExpensesByYear(currentYear);
+    console.log(data);
+    console.log(userYearData);
 
     return (
         <AppLayout>
