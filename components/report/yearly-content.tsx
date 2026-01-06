@@ -4,9 +4,9 @@ import { useDashboardLayout } from "../dashboard/dashboard-layout";
 import { Text } from "../retroui/Text";
 import { Button } from "../retroui/Button";
 import { Menu, X } from "lucide-react";
-import { BarChart } from "../retroui/charts/BarChart";
 import { Select } from "../retroui/Select";
 import { useRouter } from "next/navigation";
+import { YearlyBarChart, YearlyCards } from "./yearly-component";
 
 interface YearlyContentProps {
     startYear: number | null;
@@ -64,6 +64,8 @@ export function YearlyContent({ startYear }: YearlyContentProps) {
             </div>
             <div className="mt-4 w-full">
                 <Text as="h3" className="dark:text-foreground">Yearly Report</Text>
+                <YearlyCards />
+                <YearlyBarChart />
             </div>
         </>
     )

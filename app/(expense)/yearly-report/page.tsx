@@ -20,10 +20,10 @@ export default async function ExpenseYearlyPage({
     }
 
     const currentYear = new Date().getFullYear();
+    const selectedYear = !isNaN(yearNumber) && yearNumber > 0 ? yearNumber : currentYear;
 
-
-    const userYearData = await getUserYearData(currentYear);
-    const data = await getExpensesByYear(currentYear);
+    const userYearData = await getUserYearData(selectedYear);
+    const data = await getExpensesByYear(selectedYear);
     console.log(data);
     console.log(userYearData);
 
