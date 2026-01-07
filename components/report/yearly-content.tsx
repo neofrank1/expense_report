@@ -7,12 +7,9 @@ import { Menu, X } from "lucide-react";
 import { Select } from "../retroui/Select";
 import { useRouter } from "next/navigation";
 import { YearlyBarChart, YearlyCards } from "./yearly-component";
+import type { YearlyContentProps} from "@/types/expense.types";
 
-interface YearlyContentProps {
-    startYear: number | null;
-}
-
-export function YearlyContent({ startYear }: YearlyContentProps) {
+export function YearlyContent({ startYear, topCategoryYearly }: YearlyContentProps) {
     const { isSidebarOpen, toggleSidebar } = useDashboardLayout();
     const router = useRouter();
     
@@ -20,14 +17,12 @@ export function YearlyContent({ startYear }: YearlyContentProps) {
     const currentYear = new Date().getFullYear();
     const years: number[] = [];
     
-    if (startYear) {
-        for (let year = startYear; year <= currentYear; year++) {
-            years.push(year);
-        }
-    } else {
-        // If no start year, just show current year
-        years.push(currentYear);
+     const start = Math.min(startYear ?? currentYear, currentYear);
+
+    for (let year = start; year <= currentYear; year++) {
+        years.push(year);
     }
+    const categories = Array.isArray(topCategoryYearly) ? topCategoryYearly : [];
     
     const handleYearChange = (value: string) => {
         const year = parseInt(value);
@@ -63,8 +58,8 @@ export function YearlyContent({ startYear }: YearlyContentProps) {
                 </div>
             </div>
             <div className="mt-4 w-full">
-                <Text as="h3" className="dark:text-foreground">Yearly Report</Text>
-                <YearlyCards />
+                <Text as="h3" className="dark:text-foreground">The Top of Tops</Text>
+                <YearlyCards topCategory={categories} />
                 <YearlyBarChart />
             </div>
         </>

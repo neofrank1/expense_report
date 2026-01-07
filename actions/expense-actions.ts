@@ -267,3 +267,33 @@ export async function getExpensesByYear(year: number) {
     
     return expenses;
 }
+
+export async function getTopCategoryYearly(year: number) {
+    const user = await currentUser();
+    
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    if (!year || isNaN(year)) {
+        throw new Error("Valid year is required");
+    }
+
+    const topCategory = await db.select
+    ({
+        total_amount: sql<number>`COALESCE(SUM(${user_expenses.amount}), 0)`.as('total_amount'),
+        category_name: sql<string>`COALESCE(${expense_categories.name}, 'Uncategorized')`.as('category_name'),
+    })
+    .from(user_expenses)
+    .leftJoin(expense_categories, eq(user_expenses.category_id, expense_categories.id))
+    .where(
+        and(
+            eq(user_expenses.user_id, user.id),
+            sql`EXTRACT(YEAR FROM ${user_expenses.date}) = ${year}`
+        )
+    )
+    .groupBy(user_expenses.category_id, expense_categories.name)
+    .orderBy(desc(sql<number>`COALESCE(SUM(${user_expenses.amount}), 0)`));
+
+    return topCategory;
+}

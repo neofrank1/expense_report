@@ -66,4 +66,14 @@ interface UserYearDataResponse {
     startYear: number | null;
 }
 
-export type { Expense, ExpenseCategoryData, TotalExpensesByMonth, ExpenseByCategory, DashboardLayoutProps, ExpenseBySearchParams, ExpenseSearchParams, ExpenseEditParams, UserYearData, UserYearDataResponse };
+interface TopCategoryYearly {
+    category_name: string;
+    total_amount: number | string;
+}
+
+interface YearlyContentProps {
+    startYear?: number | null;
+    topCategoryYearly: TopCategoryYearly[];
+}
+
+export type { Expense, ExpenseCategoryData, TotalExpensesByMonth, ExpenseByCategory, DashboardLayoutProps, ExpenseBySearchParams, ExpenseSearchParams, ExpenseEditParams, UserYearData, UserYearDataResponse, YearlyContentProps, TopCategoryYearly };

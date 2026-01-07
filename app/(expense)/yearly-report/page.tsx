@@ -3,7 +3,7 @@ import { AppLayout } from "@/components/layout/app-layout";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { YearlyContent } from "@/components/report/yearly-content";
-import { getExpensesByYear, getUserYearData } from "@/actions/expense-actions";
+import { getExpensesByYear, getUserYearData, getTopCategoryYearly } from "@/actions/expense-actions";
 
 export default async function ExpenseYearlyPage({
     searchParams,
@@ -24,13 +24,12 @@ export default async function ExpenseYearlyPage({
 
     const userYearData = await getUserYearData(selectedYear);
     const data = await getExpensesByYear(selectedYear);
-    console.log(data);
-    console.log(userYearData);
+    const topCategory = await getTopCategoryYearly(selectedYear);
 
     return (
         <AppLayout>
             <DashboardLayout>
-                <YearlyContent startYear={userYearData.startYear} />
+                <YearlyContent startYear={userYearData.startYear} topCategoryYearly={topCategory} />
             </DashboardLayout>
         </AppLayout>
     )

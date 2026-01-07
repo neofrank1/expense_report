@@ -3,8 +3,14 @@
 import { BarChart } from "../retroui/charts/BarChart";
 import { Text } from "../retroui/Text";
 import { Card } from "../retroui/Card";
+import type { TopCategoryYearly } from "@/types/expense.types";
+import { useCurrency } from "@/contexts/currency-context";
 
-export function YearlyCards() {
+export function YearlyCards({ topCategory }: { topCategory: TopCategoryYearly[] }) {
+    const categories = Array.isArray(topCategory) ? topCategory : [];
+    const { formatCurrency } = useCurrency();
+    console.log(categories);
+
     return (
         <div className="mt-4 w-full grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
@@ -15,6 +21,15 @@ export function YearlyCards() {
             <Card>
                 <Card.Content>
                     <Text as="h4" className="dark:text-foreground">Top Category</Text>
+                    <div className="flex flex-row justify-between mt-2">
+                        <div>
+                            {categories[0]['category_name']}
+                        </div>
+                        <div>
+                            {formatCurrency(categories[0]['total_amount'])}
+                        </div>
+                    </div>
+                    
                 </Card.Content>
             </Card>
             <Card>
