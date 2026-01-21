@@ -76,4 +76,15 @@ interface YearlyContentProps {
     topCategoryYearly: TopCategoryYearly[];
 }
 
-export type { Expense, ExpenseCategoryData, TotalExpensesByMonth, ExpenseByCategory, DashboardLayoutProps, ExpenseBySearchParams, ExpenseSearchParams, ExpenseEditParams, UserYearData, UserYearDataResponse, YearlyContentProps, TopCategoryYearly };
+interface TotalExpensesYearly {
+    year: number;
+    total_amount: number | string;
+    count: number;
+}
+
+interface TopMonthSpendYearly {
+    month: string;
+    total_amount: number | string;
+}
+
+export type { Expense, ExpenseCategoryData, TotalExpensesByMonth, ExpenseByCategory, DashboardLayoutProps, ExpenseBySearchParams, ExpenseSearchParams, ExpenseEditParams, UserYearData, UserYearDataResponse, YearlyContentProps, TopCategoryYearly, TotalExpensesYearly, TopMonthSpendYearly };

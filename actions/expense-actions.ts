@@ -199,24 +199,13 @@ export async function deleteExpense(expenseId: number) {
 }
 
 // Get the Users Data in years
-export async function getUserYearData(year: number): Promise<UserYearDataResponse> {
+export async function getUserYearData(year: number): Promise<number | null> {
     const user = await currentUser();
     
     if (!user) {
         throw new Error("User not found");
     }
 
-    const yearData = await db
-        .select({
-            year: sql<number>`EXTRACT(YEAR FROM ${user_expenses.date})`.as('year'),
-            total_amount: sql<number>`COALESCE(SUM(${user_expenses.amount}), 0)`.as('total_amount'),
-            count: sql<number>`COUNT(${user_expenses.id})`.as('count')
-        })
-        .from(user_expenses)
-        .where(eq(user_expenses.user_id, user.id))
-        .groupBy(sql`EXTRACT(YEAR FROM ${user_expenses.date})`)
-        .orderBy(sql`EXTRACT(YEAR FROM ${user_expenses.date}) DESC`);
-    
     // Get the start year (earliest year)
     const startYearResult = await db
         .select({
@@ -227,10 +216,7 @@ export async function getUserYearData(year: number): Promise<UserYearDataRespons
     
     const startYear = startYearResult[0]?.startYear || null;
     
-    return {
-        years: yearData,
-        startYear: startYear
-    };
+    return startYear;
 }
 
 // Get expenses for a specific year
@@ -296,4 +282,84 @@ export async function getTopCategoryYearly(year: number) {
     .orderBy(desc(sql<number>`COALESCE(SUM(${user_expenses.amount}), 0)`));
 
     return topCategory;
+}
+
+export async function getTotalExpensesYearly(year: number) {
+    const user = await currentUser();
+    
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    if (!year || isNaN(year)) {
+        throw new Error("Valid year is required");
+    }
+
+    const totalExpenses = await db.select({
+        year: sql<number>`EXTRACT(YEAR FROM ${user_expenses.date})`.as('year'),
+        total_amount: sql<number>`COALESCE(SUM(${user_expenses.amount}), 0)`.as('total_amount'),
+        count: sql<number>`COUNT(${user_expenses.id})`.as('count')
+    })
+    .from(user_expenses)
+    .where(and(eq(user_expenses.user_id, user.id), sql`EXTRACT(YEAR FROM ${user_expenses.date}) = ${year}`))
+    .groupBy(sql`EXTRACT(YEAR FROM ${user_expenses.date})`)
+    .orderBy(sql`EXTRACT(YEAR FROM ${user_expenses.date}) DESC`);
+
+    return totalExpenses;
+}
+
+export async function getTopMonthSpendYearly(year: number) {
+    const user = await currentUser();
+    
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    if (!year || isNaN(year)) {
+        throw new Error("Valid year is required");
+    }
+
+    const topMonthSpend = await db.select({
+        month: sql<string>`TO_CHAR(${user_expenses.date}, 'YYYY-MM')`.as('month'),
+        total_amount: sql<number>`COALESCE(SUM(${user_expenses.amount}), 0)`.as('total_amount'),
+    })
+    .from(user_expenses)
+    .where(and(eq(user_expenses.user_id, user.id), sql`EXTRACT(YEAR FROM ${user_expenses.date}) = ${year}`))
+    .groupBy(sql`TO_CHAR(${user_expenses.date}, 'YYYY-MM')`)
+    .orderBy(sql`TO_CHAR(${user_expenses.date}, 'YYYY-MM') DESC`);
+
+    return topMonthSpend;
+}
+
+export async function getMonthlyExpensesByYear(year: number) {
+    const user = await currentUser();
+    
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    if (!year || isNaN(year)) {
+        throw new Error("Valid year is required");
+    }
+
+    const monthlyExpenses = await db.select({
+        month: sql<string>`TO_CHAR(${user_expenses.date}, 'YYYY-MM')`.as('month'),
+        month_number: sql<number>`EXTRACT(MONTH FROM ${user_expenses.date})`.as('month_number'),
+        total_amount: sql<number>`COALESCE(SUM(${user_expenses.amount}), 0)`.as('total_amount'),
+        count: sql<number>`COUNT(${user_expenses.id})`.as('count')
+    })
+    .from(user_expenses)
+    .where(
+        and(
+            eq(user_expenses.user_id, user.id),
+            sql`EXTRACT(YEAR FROM ${user_expenses.date}) = ${year}`
+        )
+    )
+    .groupBy(
+        sql`TO_CHAR(${user_expenses.date}, 'YYYY-MM')`,
+        sql`EXTRACT(MONTH FROM ${user_expenses.date})`
+    )
+    .orderBy(sql`EXTRACT(MONTH FROM ${user_expenses.date}) ASC`);
+
+    return monthlyExpenses;
 }

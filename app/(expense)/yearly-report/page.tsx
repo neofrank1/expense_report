@@ -3,7 +3,7 @@ import { AppLayout } from "@/components/layout/app-layout";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { YearlyContent } from "@/components/report/yearly-content";
-import { getExpensesByYear, getUserYearData, getTopCategoryYearly } from "@/actions/expense-actions";
+import { getUserYearData, getTopCategoryYearly, getTotalExpensesYearly, getTopMonthSpendYearly, getMonthlyExpensesByYear } from "@/actions/expense-actions";
 
 export default async function ExpenseYearlyPage({
     searchParams,
@@ -23,13 +23,15 @@ export default async function ExpenseYearlyPage({
     const selectedYear = !isNaN(yearNumber) && yearNumber > 0 ? yearNumber : currentYear;
 
     const userYearData = await getUserYearData(selectedYear);
-    const data = await getExpensesByYear(selectedYear);
+    const totalExpenses = await getTotalExpensesYearly(selectedYear);
+    const topMonthSpend = await getTopMonthSpendYearly(selectedYear);
     const topCategory = await getTopCategoryYearly(selectedYear);
+    const monthlyExpenses = await getMonthlyExpensesByYear(selectedYear);
 
     return (
         <AppLayout>
             <DashboardLayout>
-                <YearlyContent startYear={userYearData.startYear} topCategoryYearly={topCategory} />
+                <YearlyContent startYear={userYearData ?? 0} topCategoryYearly={topCategory} totalExpenses={totalExpenses} topMonthSpend={topMonthSpend} monthlyExpenses={monthlyExpenses} />
             </DashboardLayout>
         </AppLayout>
     )
