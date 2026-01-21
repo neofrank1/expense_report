@@ -18,6 +18,11 @@ const dashboardMenus: DashboardMenu[] = [
         name: "Expense History",
         href: "/history",
         icon: <Home />
+    }, 
+    {
+        name: "Yearly Expense Report",
+        href: "/yearly-report",
+        icon: <Home />
     }
 ]
 
@@ -41,7 +46,7 @@ export function SidebarDashboard() {
             </div>
             <div className="mt-auto mb-1">
                 <Select name="currency" value={currency} onValueChange={(value) => setCurrency(value as 'USD' | 'EUR' | 'PHP')}>
-                    <Select.Trigger className="dark:text-slate-900 dark:bg-white dark:border-slate-900 w-full h-full">
+                    <Select.Trigger className="dark:text-slate-900 dark:bg-white dark:border-slate-900 w-full h-full min-w-[100px]">
                         <Select.Value placeholder="Pick Currency" />
                     </Select.Trigger>
                     <Select.Content className="dark:bg-white dark:text-slate-900">
